@@ -1,5 +1,5 @@
 # Notification System
- Simple implementation of notification system using FastAPI and Websockets with JavaScript
+ This project implements a WebSocket-based notification service using FastAPI. It interacts with a SQLite database to store and manage notifications.
 
  ## Explanation:
 - **`database/notif.db`**: SQLite database for storing notifications.
