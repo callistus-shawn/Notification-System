@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<title>Statistics</title>
+
+		<link href="static/css/bootstrap.css" rel="stylesheet" />
+		<link href="static/css/all.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+		<link rel="icon" href="images/favicon.png" />
+		
+		<script src="static/js/jquery-3.4.1.min.js"></script>
+		<script src="static/js/bootstrap.min.js"></script>
+		<script type='text/javascript' src='https://unpkg.com/leaflet@1.5.1/dist/leaflet.js'></script>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+		
+		<script type='text/javascript' src="static/js/dashboard.js"></script>
+		
+		<style>
+		#mapid {
+			height: 600px;
+			margin-right: 16px;
+		}
+
+		.notification-bell {
+            margin-left: 75rem ;
+			cursor: pointer;
+        }
+        .notification-count {
+			margin-top: -30px;
+            margin-left: 20px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 3px 7px;
+            font-size: 12px;
+		}
+		
+		ul#locContainer li {
+			font-size: 14pt;
+		}
+		
+		li i {
+			padding-right: 8px;
+		}
+		
+		.hovershadow {
+			transition: box-shadow 0.3s ease-in-out;
+		}
+		
+		.hovershadow:hover {
+			box-shadow: 0px 0px 10px 2px gray;
+		}
+
+
+
+		.notification-window {
+            display: none;
+            position: absolute;
+            top: 35px;
+            right: 140px;
+            width: 300px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+
+        .notification-window .header {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            font-weight: bold;
+        }
+
+        .notification-window .body {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .notification-window .notification {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+		</style>
+		
+		<script>
+		//Geolocation of Goa
+		var goaLocation = {
+			loc: {lat: 15.4279, lon: 73.9325},
+			zoom: 10
+		};
+		
+		
+
+		//Gather data from somewhere
+		var Data = [
+			{
+				location: {
+					warehouse_name: 'Warehouse 1',
+					country: 'India',
+					state: 'Goa',
+					city: 'Panjim',
+					latitude: 15.4989946, 
+					longitude: 73.8282141
+				},
+				status: {
+					'Metrics': {
+						value: 100,
+						threshold: {
+							min: 50,
+							max: 180
+						},
+						icon_class: 0
+					},
+					
+					'Power': {
+						value: 18690,
+						threshold: {
+							min: 0,
+							max: 18740,
+							warn: 18700
+						},
+						icon_class: 1
+					},
+					
+					'Attendance': {
+						value: 33,
+						threshold: null,
+						icon_class: 2
+					},
+					
+					'Emergencies': {
+						value: 2,
+						threshold: null,
+						icon_class: 3
+					}
+				}
+			},
+			{
+				location: {
+					warehouse_name: 'Big Godown',
+					country: 'India',
+					state: 'Goa',
+					city: 'Verna',
+					latitude: 15.3510255,
+					longitude: 73.9303722
+				},
+				status: {
+					'Metrics': {
+						value: 150,
+						threshold: {
+							min: 100,
+							max: 200
+						},
+						icon_class: 0
+					},
+					
+					'Power': {
+						value: 158,
+						threshold: {
+							min: 0,
+							max: 200
+						},
+						icon_class: 1
+					},
+					
+					'Emergencies': {
+						value: 1,
+						threshold: null,
+						icon_class: 3
+					}
+				}
+			},
+			
+			{
+				location: {
+					warehouse_name: 'Big Godown 2',
+					country: 'India',
+					state: 'Goa',
+					city: 'Margao',
+					latitude: 15.3610255,
+					longitude: 73.9303722
+				},
+				status: {
+					'Metrics': {
+						value: 150,
+						threshold: {
+							min: 100,
+							max: 200
+						},
+						icon_class: 0
+					},
+					
+					'Power': {
+						value: 158,
+						threshold: {
+							min: 0,
+							max: 200
+						},
+						icon_class: 1
+					},
+					
+					'Emergencies': {
+						value: 1,
+						threshold: null,
+						icon_class: 3
+					}
+				}
+			}
+		];
+		
+		function cityStatusName(n) {
+			document.getElementById("warehouse_selected").innerText = n;
+		}
+		
+		function main(event) {
+			//Setup Map to view whole of Goa
+			initMap(goaLocation);
+			
+			//Realtime graph
+			initGraph();
+			
+			//Initialize all cards, links, etc.
+			initFromData(Data);
+			
+			//Refresh
+			Update();
+			
+			//Default status of all
+			cityStatusName("All");
+			
+			//Indicate current item
+			$('a[data-toggle="pill"]').on('shown.bs.tab', function(e) {
+				cityStatusName(e.target.dataset["city_name"]);
+			});
+			
+			
+			//As an example, I'm just incrementing each value every second.
+			//In reality, new data will be fetched into "Data", then
+			//just updateValues() will be called on all cards to refresh.
+			
+			setInterval(function() {
+				//Increment all
+				//for (var x = 0; x < StatusCards.all.length; x++) {
+				//	StatusCards.all[x].setValue(StatusCards.all[x].getValue() + 1);
+				//}
+				
+				//Increment just Power of Panjim by changing Data
+				//Data[0].status.Power.value += 1;
+				
+				Update();
+			}, 1000);
+		}
+		
+		$(document).ready(function() {
+			count=0
+		$('.notification-bell').click(function() {
+			count=0
+            $('#notification-count').text(0);
+			$('#notification-window').toggle();
+        });
+		$('#notification-window').click(function(event) {
+			event.stopPropagation();
+		})
+		});
+		
+
+	async function fetchNotifications() {
+		const response = await fetch('/load');
+		const result = await response.json();
+		const notifications = result.notifications;
+		
+		notifications.forEach(notification => {
+			createNotification({ inp: notification[0],action: notification[1] });
+			})
+	};
+	fetchNotifications();
+
+	function createNotification(data){
+
+	const notificationDiv = document.createElement('div');
+    notificationDiv.className = 'notification';
+	if(data.action!=undefined){
+		if(data.action=="ack")
+    	notificationDiv.textContent = data.inp+" - Acknowledged";
+	else if(data.action=="rej")
+    	notificationDiv.textContent = data.inp+" - Rejected";
+	else if(data.action=="-")
+	notificationDiv.textContent = data.inp
+	}
+	else{
+		notificationDiv.textContent = data.inp
+	}
+	if(data.action==undefined || data.action=="-")
+	{
+    const ackButton = document.createElement('button');
+    ackButton.className = 'ack';
+    ackButton.type = 'button';
+    ackButton.textContent = 'ack';
+
+    const rejButton = document.createElement('button');
+    rejButton.type = 'button';
+	rejButton.className = 'rej';
+    rejButton.textContent = 'rej';
+
+    notificationDiv.appendChild(ackButton);
+    notificationDiv.appendChild(rejButton);
+	}
+    document.querySelector('.notification-window .body').appendChild(notificationDiv);
+    document.getElementById('notification-count').textContent = count;
+
+    
+    notificationDiv.addEventListener('click', function(event) {
+        if (event.target.classList.contains('ack')) {
+			notificationDiv.textContent=data.inp+" - Acknowledged"
+            console.log('Acknowledged:', data.inp);
+			websocket.send(JSON.stringify({ type: 'ack', message: data.inp }));
+        } else if (event.target.classList.contains('rej')) {
+			notificationDiv.textContent=data.inp+" - Rejected"
+            console.log('Rejected:', data.inp);
+			websocket.send(JSON.stringify({ type: 'rej', message: data.inp }));
+        }
+    });
+	}	
+		const urlParams = new URLSearchParams(window.location.search);
+		const myParam = urlParams.get('myParam');
+		const websocket = new WebSocket("ws://127.0.0.1:8000/ws");
+    
+    	websocket.onmessage = function(event) {
+			count+=1
+			console.log(event.data)
+        const data = JSON.parse(event.data);
+		createNotification(data)
+
+		};
+
+		window.addEventListener('load', main);
+
+		</script>
+	</head>
+
+	<body>
+		<!-- Navigation Bar -->
+		<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top">
+			<a class="navbar-brand" href="#">Logo</a>
+			
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="#"><i class="fa fa-fw fa-home"></i>Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link active" href="#"><i class="fa fa-fw fa-chart-bar"></i>Statistics</a>
+				</li>
+
+				<!-- Dropdown -->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Tools</a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href="#">Link 1</a>
+						<a class="dropdown-item" href="#">Link 2</a>
+						<a class="dropdown-item" href="#">Link 3</a>
+					</div>
+				</li>
+				
+				<li class="nav-item">
+					<a class="nav-link" href="#"><i class="fa fa-fw fa-envelope"></i>Contact</a>
+				</li>
+			</ul>
+
+			<!-- bell -->
+			<div class="container mt-5">
+				<div class="notification-bell">
+					<i class="fa fa-bell fa-2x"></i>
+					<span id="notification-count" class="notification-count">0</span>
+
+					<div id="notification-window" class="notification-window">
+						<div class="header">Notifications</div>
+						<div class="body">
+							<!-- notif -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+		
+		<div class="container-fluid">
+			<div class="row bg-dark text-white">
+				<div class="col-12">
+					<h2 class="text-white">Statistics</h2>
+				</div>
+			</div>
+		
+			<div class="row">
+				<div class="col-3 bg-secondary text-white">
+					<p><h3 class="text-center">Locations</h3></p>
+					<ul id="locContainer" class="nav nav-pills flex-column"></ul>
+				</div>
+				
+				<div class="col-6">
+					<div id="mapid"></div>
+				</div>
+				
+				<div class="col-3 bg-light">
+					<h2 class="text-center text-dark">Status - <span id="warehouse_selected"></span></h2>
+					<div class="tab-content container-fluid" id="statistic_data">
+						<div id="tab_All" class="tab-pane fade in show active"></div>
+					</div>
+				</div>
+			</div>
+			
+			
+			<!-- Modal -->
+			<div class="modal fade" id="myModal" role="dialog">
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content container-fluid">
+						<div class="modal-header">
+							<h4 class="modal-title">Graph</h4>
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+						</div>
+						<div class="modal-body">
+							<div id="chartContainer" style=" width: 400px; height: 300px;"></div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
