@@ -3,9 +3,13 @@
  This project implements a WebSocket-based notification service using FastAPI. It interacts with a SQLite database to store and manage notifications.
 
  ## Explanation:
+- **`app.py`**: The main entry point of the FastAPI application, defining routes and static file mounting.
+  
 - **`database/notif.db`**: SQLite database for storing notifications.
   
 - **`templates/index.html`**: Front-end template served by FastAPI.
+- 
+- **`static/`**: Directory for static files like CSS, JavaScript, and images.
   
 - **`rag/function.py`**: Contains the core logic for handling HTML responses, WebSocket connections, and notification management using SQL Queries.
   
