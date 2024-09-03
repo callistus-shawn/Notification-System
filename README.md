@@ -6,7 +6,8 @@
   
 ![Screenshot 2024-09-03 154449](https://github.com/user-attachments/assets/cba0f22e-87be-4225-9bf7-bbe83b71bf1f)
 ### HTML CSS Template
-- Bell icon with counter installed upon
+#### - Bell icon with counter installed upon
+
 ![Screenshot 2024-09-03 154507](https://github.com/user-attachments/assets/6bcbe02e-096d-4861-8dd6-7d15f56b140f)
 ### Notification Window along with Acknowlegment/Reject button
 ![Screenshot 2024-09-03 154521](https://github.com/user-attachments/assets/1465bc52-7fbc-4d8f-947b-f9dbe32b2bbd)
