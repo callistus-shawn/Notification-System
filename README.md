@@ -1,4 +1,5 @@
-# Notification System
+# Notification Service
+
  This project implements a WebSocket-based notification service using FastAPI. It interacts with a SQLite database to store and manage notifications.
 
  ## Explanation:
