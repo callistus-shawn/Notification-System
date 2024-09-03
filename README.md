@@ -15,7 +15,7 @@
   
 - **`model.py`**: Defines data models, such as the `Input` model used for handling inputs.
 - **`conn.py`**: Connection Manager that manages WebSocket connections.
-- **`main.py`**: The main application file that includes the endpoints and WebSocket logic
+
   
 ## Outputs
 ### FastApi- Test UI (Swagger Docs)
