@@ -1,5 +1,13 @@
 # Notification System
  Simple implementation of notification system using FastAPI and Websockets with JavaScript
+
+ ## Explanation:
+- **`database/notif.db`**: SQLite database for storing notifications.
+- **`templates/index.html`**: Front-end template served by FastAPI.
+- **`model.py`**: Defines data models, such as the `Input` model used for handling inputs.
+- **`conn.py`**: Manages WebSocket connections.
+- **`main.py`**: The main application file that includes the endpoints and WebSocket logic
+- 
 ## Outputs
 ### FastApi- Test UI (Swagger Docs)
 #### - To pass the notifications
