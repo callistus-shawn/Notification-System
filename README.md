@@ -3,8 +3,11 @@
 
  ## Explanation:
 - **`database/notif.db`**: SQLite database for storing notifications.
-- **`templates/index.html`**: Front-end template served by FastAPI.4
+  
+- **`templates/index.html`**: Front-end template served by FastAPI.
+  
 - **`rag/function.py`**: Contains the core logic for handling HTML responses, WebSocket connections, and notification management using SQL Queries.
+  
 - **`model.py`**: Defines data models, such as the `Input` model used for handling inputs.
 - **`conn.py`**: Connection Manager that manages WebSocket connections.
 - **`main.py`**: The main application file that includes the endpoints and WebSocket logic
