@@ -2,7 +2,8 @@
  Simple implementation of notification system using FastAPI and Websockets with JavaScript
 ## Outputs
 ### FastApi- Test UI (Swagger Docs)
-- To pass the notifications
+#### - To pass the notifications
+  
 ![Screenshot 2024-09-03 154449](https://github.com/user-attachments/assets/cba0f22e-87be-4225-9bf7-bbe83b71bf1f)
 ### HTML CSS Template
 - Bell icon with counter installed upon
